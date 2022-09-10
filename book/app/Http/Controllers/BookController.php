@@ -44,7 +44,7 @@ class BookController extends Controller
 
        $validator =  Validator::make($input, [
             "name" => "required|min:4",
-            "description" => "required|max:300",
+            "description" => "required|max:300|min:5",
             "price" => "required"
         ]);
 
@@ -64,7 +64,8 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        //
+        $book = Book::find($id);
+        return $this->sendResponse(new BookResource($book), "Books Get Succes");
     }
 
     /**
@@ -87,7 +88,26 @@ class BookController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $input = $request->all();
+
+        $validator =  Validator::make($input, [
+             "name" => "required|min:4",
+             "description" => "required|max:300|min:5",
+             "price" => "required"
+         ]);
+ 
+         if($validator -> fails()){
+             return $this->sendError("validation error", $validator->errors());
+         }
+
+         $book = Book::find($id);
+
+         $book->name = $input["name"];
+         $book->description = $input["description"];
+         $book->price = $input["price"];
+         $book->save();
+         return $this->sendResponse(new BookResource($book), "Books Update Succes");
+         
     }
 
     /**
@@ -98,6 +118,9 @@ class BookController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $book = Book::find($id);
+        $book-delete();
+        return $this->sendResponse([], "Sukses Hapus Produk");
+
     }
 }
