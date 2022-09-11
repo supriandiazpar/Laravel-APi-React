@@ -10,5 +10,9 @@ class Book extends Model
     use HasFactory;
 
     protected $table = "book"; // jika tidak protect maka akan auto ke tabel book
-    protected $fillable = ["name", "description", "price", "image"]; //yang boleh masuk ke tabel
+    protected $fillable = ["name", "description", "price", "category_id", "image"]; //yang boleh masuk ke tabel
+
+    public function category(){
+        return $this->belongsTo(Category::class);
+    }
 }

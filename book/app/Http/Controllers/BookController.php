@@ -16,7 +16,7 @@ class BookController extends Controller
      */
     public function index()
     {
-        $book = Book::all(); // = select * From book
+        $book = Book::with("category")->paginate(); // = select * From book
         $bookresource = BookResource::collection($book);
 
        return $this-> sendResponse($bookresource, "Succesfull get book"); //
@@ -53,7 +53,8 @@ class BookController extends Controller
         }
 
         $book = Book::create($input);
-        return $this->sendResponse(new BookResource($book), "Books Create Succes");
+        $findBook = Book::with("category")->find($book->id); //refresh table after save data
+        return $this->sendResponse(new BookResource($findBook), "Books Create Succes");
     }
 
     /**
@@ -64,7 +65,7 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        $book = Book::find($id);
+        $book = Book::with("category")->find($id);
         return $this->sendResponse(new BookResource($book), "Books Get Succes");
     }
 
@@ -103,10 +104,12 @@ class BookController extends Controller
          $book = Book::find($id);
 
          $book->name = $input["name"];
+         $book->category_id = $input["category_id"];
          $book->description = $input["description"];
          $book->price = $input["price"];
          $book->save();
-         return $this->sendResponse(new BookResource($book), "Books Update Succes");
+         $findBook = Book::with("category")->find($book->id); //refresh table after save data
+         return $this->sendResponse(new BookResource($findBook), "Books Update Succes");
          
     }
 
@@ -119,7 +122,7 @@ class BookController extends Controller
     public function destroy($id)
     {
         $book = Book::find($id);
-        $book-delete();
+        $book->delete();
         return $this->sendResponse([], "Sukses Hapus Produk");
 
     }
