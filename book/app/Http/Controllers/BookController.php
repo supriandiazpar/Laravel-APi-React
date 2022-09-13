@@ -44,13 +44,21 @@ class BookController extends Controller
 
        $validator =  Validator::make($input, [
             "name" => "required|min:4",
+            "category_id" => "required",
             "description" => "required|max:300|min:5",
-            "price" => "required"
+            "price" => "required",
+            "image" => "required|mimes:jpg,bmp,png|max:2048"
         ]);
 
         if($validator -> fails()){
             return $this->sendError("validation error", $validator->errors());
         }
+
+        $uploadFile = $request->image;
+        $fileName = uniqid() .".". $uploadFile->getClientOriginalExtension(); //renama nema file to name generate
+        $uploadFile->move(public_path().'/images/book', $fileName );
+
+        $input["image"] = $fileName;
 
         $book = Book::create($input);
         $findBook = Book::with("category")->find($book->id); //refresh table after save data
